@@ -1,0 +1,78 @@
+{
+  "hardware": "Apple M1, 8 GiB unified RAM, macOS 26.3.1",
+  "resolution": "1280x720",
+  "vsync": false,
+  "warmup_seconds": 2,
+  "duration_seconds": 12,
+  "runs": [
+    {
+      "scene": "Ready",
+      "mean_fps": 504.4041381315496,
+      "p95_ms": 3.93125,
+      "min_fps": 30.875442290710815,
+      "max_particles": 0,
+      "samples": 5044,
+      "command": [
+        "/Users/aruispan/CGF-final/build/baikonur",
+        "--duration",
+        "12",
+        "--width",
+        "1280",
+        "--height",
+        "720",
+        "--no-retina",
+        "--no-vsync",
+        "--csv",
+        "/Users/aruispan/CGF-final/docs/evidence/ready.csv"
+      ]
+    },
+    {
+      "scene": "Ignition and ascent",
+      "mean_fps": 477.62738821867976,
+      "p95_ms": 2.73467,
+      "min_fps": 10.238998707838363,
+      "max_particles": 1399,
+      "samples": 4777,
+      "command": [
+        "/Users/aruispan/CGF-final/build/baikonur",
+        "--duration",
+        "12",
+        "--width",
+        "1280",
+        "--height",
+        "720",
+        "--no-retina",
+        "--no-vsync",
+        "--csv",
+        "/Users/aruispan/CGF-final/docs/evidence/ignition_and_ascent.csv",
+        "--launch",
+        "--start-time",
+        "-3"
+      ]
+    },
+    {
+      "scene": "Separation and stars",
+      "mean_fps": 586.1536441953612,
+      "p95_ms": 2.14421,
+      "min_fps": 98.5338168059278,
+      "max_particles": 1398,
+      "samples": 5861,
+      "command": [
+        "/Users/aruispan/CGF-final/build/baikonur",
+        "--duration",
+        "12",
+        "--width",
+        "1280",
+        "--height",
+        "720",
+        "--no-retina",
+        "--no-vsync",
+        "--csv",
+        "/Users/aruispan/CGF-final/docs/evidence/separation_and_stars.csv",
+        "--launch",
+        "--start-time",
+        "24"
+      ]
+    }
+  ]
+}

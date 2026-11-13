@@ -1,0 +1,17 @@
+{
+  "source_resolution": [
+    1920,
+    1080
+  ],
+  "output_resolution": [
+    1920,
+    1080
+  ],
+  "output_fps": 30,
+  "output_seconds": 200,
+  "source": "one continuous capture of current terrain and scenery",
+  "encoder": "VideoToolbox H.264 master; libx264 CRF 18 delivery",
+  "speed_changes": false,
+  "ending": "At most 0.1 seconds of the paused final frame held to reach 200 seconds",
+  "capture_log": "demo.log"
+}
