@@ -1,4 +1,8 @@
 #include "Texture.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
+#include <stb_image.h>
+#include <stdexcept>
 #include <random>
 #include <vector>
 namespace bk {
@@ -20,6 +24,21 @@ Texture::Texture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+Texture::Texture(const std::string &path) {
+    int width=0,height=0,channels=0;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char *pixels=stbi_load(path.c_str(),&width,&height,&channels,4);
+    if(!pixels) throw std::runtime_error("Cannot load flag image: "+path);
+    glGenTextures(1,&id);
+    glBindTexture(GL_TEXTURE_2D,id);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
+    stbi_image_free(pixels);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 Texture::~Texture() {

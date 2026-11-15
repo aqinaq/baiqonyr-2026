@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdio>
 #include <fstream>
+#include <filesystem>
 #include <glad/gl.h>
 #include <stdexcept>
 #include <string>
@@ -13,11 +14,16 @@ inline std::vector<unsigned char> pixels(int w, int h) {
     return p;
 }
 inline void screenshot(const std::string &file, int w, int h) {
+    const auto parent = std::filesystem::path(file).parent_path();
+    if (!parent.empty()) std::filesystem::create_directories(parent);
     auto p = pixels(w, h);
     std::ofstream f(file, std::ios::binary);
+    if (!f) throw std::runtime_error("Cannot open screenshot: " + file);
     f << "P6\n" << w << ' ' << h << "\n255\n";
     for (int y = h - 1; y >= 0; y--)
         f.write((char *)p.data() + size_t(y) * w * 3, w * 3);
+    f.close();
+    if (!f) throw std::runtime_error("Cannot write screenshot: " + file);
 }
 inline std::string shellQuote(const std::string &s) {
 #ifdef _WIN32
@@ -44,6 +50,8 @@ class Recorder {
   public:
     Recorder(const std::string &exe, const std::string &file, int w, int h, bool hardware = false)
         : width(w), height(h) {
+        const auto parent = std::filesystem::path(file).parent_path();
+        if (!parent.empty()) std::filesystem::create_directories(parent);
         std::string encoder = hardware
                                   ? " -c:v h264_videotoolbox -b:v 50M -profile:v high -realtime 1"
                                   : " -c:v libx264 -preset ultrafast -crf 16";

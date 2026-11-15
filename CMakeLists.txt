@@ -13,8 +13,8 @@ add_subdirectory(vendor/glfw)
 add_library(imgui STATIC vendor/imgui/imgui.cpp vendor/imgui/imgui_draw.cpp vendor/imgui/imgui_tables.cpp vendor/imgui/imgui_widgets.cpp vendor/imgui/backends/imgui_impl_glfw.cpp vendor/imgui/backends/imgui_impl_opengl3.cpp)
 target_include_directories(imgui PUBLIC vendor/imgui vendor/imgui/backends)
 target_link_libraries(imgui PUBLIC glfw)
-add_executable(baikonur src/main.cpp src/Shader.cpp src/Mesh.cpp src/Kazakhstan.cpp src/Environment.cpp src/Scene.cpp src/Particles.cpp src/UI.cpp src/Texture.cpp)
-target_include_directories(baikonur PRIVATE src vendor/glm vendor/glfw/deps)
+add_executable(baikonur src/main.cpp src/Shader.cpp src/Mesh.cpp src/Kazakhstan.cpp src/Environment.cpp src/Scene.cpp src/Particles.cpp src/UI.cpp src/Texture.cpp src/DetailGeometry.cpp src/LaunchDetails.cpp src/Crew.cpp)
+target_include_directories(baikonur PRIVATE src vendor/glm vendor/glfw/deps vendor/stb)
 target_link_libraries(baikonur PRIVATE imgui)
 target_compile_definitions(baikonur PRIVATE GLFW_INCLUDE_NONE GLM_FORCE_RADIANS)
 if(MSVC)
@@ -22,8 +22,13 @@ if(MSVC)
 else()
  target_compile_options(baikonur PRIVATE -Wall -Wextra -Wpedantic)
 endif()
-add_custom_command(TARGET baikonur POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:baikonur>/shaders)
-add_custom_command(TARGET baikonur POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:baikonur>/assets)
+# Refresh resources even when only an asset/shader changed and no relink is needed.
+add_custom_target(baikonur_resources ALL
+ COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:baikonur>/shaders
+ COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:baikonur>/assets
+ COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/img $<TARGET_FILE_DIR:baikonur>/img
+ DEPENDS baikonur
+ VERBATIM)
 enable_testing()
 add_executable(simulation_tests tests/simulation_tests.cpp)
 target_include_directories(simulation_tests PRIVATE src vendor/glm)

@@ -21,9 +21,9 @@ struct Options {
     int width = 1280, height = 720;
     double duration = 0, captureAt = -1;
     float startTime = -8;
-    int destination = -1;
+    int destination = -1, nextDestination = -1;
     bool demo = false, launch = false, vsync = true, retina = true, hardwareEncode = false,
-         wireframe = false;
+         wireframe = false, firstPerson = false, siteOverview = false, landmarkView = false;
     std::string capture = "output/screenshot.ppm", csv, record, ffmpeg = "ffmpeg";
 };
 Options options(int argc, char **argv) {
@@ -47,6 +47,8 @@ Options options(int argc, char **argv) {
             o.capture = value();
         else if (a == "--csv")
             o.csv = value();
+        else if (a == "--next-destination")
+            o.nextDestination = std::stoi(value());
         else if (a == "--destination")
             o.destination = std::stoi(value());
         else if (a == "--start-time")
@@ -57,6 +59,12 @@ Options options(int argc, char **argv) {
             o.ffmpeg = value();
         else if (a == "--hardware-encode")
             o.hardwareEncode = true;
+        else if (a == "--landmark-view")
+            o.landmarkView = true;
+        else if (a == "--site-overview")
+            o.siteOverview = true;
+        else if (a == "--first-person")
+            o.firstPerson = true;
         else if (a == "--wireframe")
             o.wireframe = true;
         else if (a == "--demo")
@@ -72,14 +80,15 @@ Options options(int argc, char **argv) {
                 << "Baikonur: --demo --duration SECONDS --launch --start-time SECONDS "
                    "--width N --height N --no-retina --no-vsync --csv FILE --capture-at SECONDS "
                    "--capture FILE.ppm --record FILE.mp4 --ffmpeg PATH --wireframe "
-                   "--hardware-encode (macOS) --destination 0..8 (auto-select in space)\n";
+                   "--hardware-encode (macOS) --first-person --site-overview --landmark-view --destination 0..8 --next-destination 0..8 (auto-select in space)\n";
             std::exit(0);
         } else
             throw std::runtime_error("Unknown option: " + a);
     }
     if (o.width < 640 || o.height < 360 || o.width > 3840 || o.height > 2160 || o.duration < 0)
         throw std::runtime_error("Invalid dimensions or duration");
-    if (o.destination < -1 || o.destination >= destinationCount)
+    if (o.destination < -1 || o.destination >= destinationCount ||
+        o.nextDestination < -1 || o.nextDestination >= destinationCount)
         throw std::runtime_error("Destination must be 0..8");
     return o;
 }
@@ -98,7 +107,7 @@ int main(int argc, char **argv) {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_SAMPLES, o.record.empty() ? 4 : 0);
         glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, o.retina ? GL_TRUE : GL_FALSE);
-        window = glfwCreateWindow(o.width, o.height, "BAIKONUR / Launch 09", nullptr, nullptr);
+        window = glfwCreateWindow(o.width, o.height, "AITU / NSH-119 / BAIQONYR", nullptr, nullptr);
         if (!window)
             throw std::runtime_error("OpenGL 3.3 core context unavailable");
         glfwMakeContextCurrent(window);
@@ -127,12 +136,19 @@ int main(int argc, char **argv) {
             scene.wireframe = o.wireframe;
             Particles particles(shaderDir.string());
             Camera camera;
+            camera.firstPerson = o.firstPerson;
+            if(o.siteOverview) camera.toggleSite();
+            if(o.landmarkView) camera.toggleLandmark();
             Mission mission;
             if (o.launch) {
                 mission.launch();
                 mission.clock = o.startTime;
-                if (mission.clock >= 24)
-                    mission.separate();
+                if(o.startTime>-8) mission.boarding=Mission::boardingDuration;
+                if (mission.clock >= 24) {
+                    mission.separated = true;
+                    mission.separationTime = 24.f;
+                    mission.boosterAge = mission.clock - mission.separationTime;
+                }
                 camera.chase = true;
             }
             UIState ui;
@@ -140,7 +156,10 @@ int main(int argc, char **argv) {
             ui.demo = o.demo;
             std::ofstream csv;
             if (!o.csv.empty()) {
+                const auto parent = std::filesystem::path(o.csv).parent_path();
+                if (!parent.empty()) std::filesystem::create_directories(parent);
                 csv.open(o.csv);
+                if (!csv) throw std::runtime_error("Cannot open CSV: " + o.csv);
                 csv << "wall_seconds,mission_seconds,altitude_m,particles,frame_ms\n";
             }
             std::unique_ptr<Recorder> recorder;
@@ -207,7 +226,11 @@ int main(int argc, char **argv) {
                     if (pressed(GLFW_KEY_B))
                         mission.separate();
                     if (pressed(GLFW_KEY_C))
-                        camera.chase = !camera.chase;
+                        camera.firstPerson = !camera.firstPerson;
+                    if (pressed(GLFW_KEY_J) && !mission.running) camera.toggleLandmark();
+                    if (pressed(GLFW_KEY_V) && !mission.running) camera.toggleSite();
+                    if (pressed(GLFW_KEY_1)) camera.firstPerson = true;
+                    if (pressed(GLFW_KEY_3)) camera.firstPerson = false;
                     if (pressed(GLFW_KEY_K))
                         camera.shake = !camera.shake;
                     if (pressed(GLFW_KEY_L))
@@ -242,22 +265,28 @@ int main(int argc, char **argv) {
                     camera.yaw += dt * .10f;
                 }
                 if (ui.reset) {
+                    o.destination=-1;
+                    o.nextDestination=-1;
                     mission.reset();
                     particles.reset();
-                    camera = Camera{};
+                    camera.returnHome();
                     ui.reset = false;
                 }
-                bool wasInSpace = mission.inSpace();
                 mission.update(dt);
-                if (!wasInSpace && mission.flight == Flight::Choosing) {
-                    camera.distance = 10500; camera.pitch = 1.18f; camera.yaw = 0;
-                }
                 if (mission.flight == Flight::Choosing && o.destination >= 0) {
                     mission.selectDestination(o.destination);
                     glm::vec3 approach = glm::normalize(destinations[o.destination].center-mission.position());
-                    camera.yaw = std::atan2(-approach.x,-approach.z)+.3f;
-                    camera.pitch = .12f;
-                    camera.distance = 58;
+                    if(!camera.firstPerson) {
+                        camera.yaw = std::atan2(-approach.x,-approach.z)+.3f;
+                        camera.pitch = .12f;
+                    }
+                    camera.distance = 68;
+                    o.destination=-1; // A preview must never auto-select again after restart.
+                }
+                if(mission.canContinue() && o.nextDestination>=0) {
+                    if(!mission.selectDestination(o.nextDestination))
+                        throw std::runtime_error("Cannot start requested onward destination");
+                    o.nextDestination=-1;
                 }
                 particles.update(dt, mission);
                 if (target)
@@ -272,7 +301,7 @@ int main(int argc, char **argv) {
                     ui.frameMs = 1000.f / ui.fps;
                     frames = 0;
                     fpsStart = now;
-                    std::string title = "BAIKONUR / " + mission.phase() + " / " +
+                    std::string title = "AITU / NSH-119 / " + mission.phase() + " / " +
                                         std::to_string(int(ui.fps)) + " FPS";
                     glfwSetWindowTitle(window, title.c_str());
                 }

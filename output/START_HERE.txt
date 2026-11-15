@@ -1,0 +1,19 @@
+Baiqonyr / AITU Aerospace NSH-119
+Repository: https://github.com/aqinaq/baiqonyr-2026
+Defense: 19 November 2026
+Brief deadline: 16 November 2026, 23:59 Asia/Almaty
+
+Preparation status: report and slides are being handled by teammates; video recording and submission remain pending. This file is not proof of submission.
+
+Required final files:
+  Baikonur_Source.zip
+  pdf/Baikonur_Report.pdf
+  Baikonur_Presentation.pptx
+  Baikonur_Demo_1080p.mp4
+
+README.md in the source contains build/run instructions and controls.
+The macOS Apple Silicon backup, if included, is platform-specific and unsigned.
+Keep assets, img and shaders beside the executable.
+An editable report DOCX is optional.
+The final submission archive flattens the report PDF to Baikonur_Report.pdf.
+Verify SHA256SUMS.txt against the final included files.

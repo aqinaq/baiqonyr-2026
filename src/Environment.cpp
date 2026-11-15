@@ -168,6 +168,7 @@ void Scene::buildEnvironment() {
     }
     for (int i = 0; i < 240; ++i) {
         float x = (random() - .5f) * 420, z = (random() - .5f) * 420;
+        if (x>88 && x<165 && z>-150 && z<120) continue;
         if (std::abs(x) < 88 && z > -102 && z < 45)
             continue;
         if ((std::abs(x) < 9 && z > 0 && z < 170) || std::abs(x + 48) < 6 ||

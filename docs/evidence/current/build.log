@@ -1,0 +1,7 @@
+[  4%] Built target simulation_tests
+[ 10%] Built target terrain_tests
+[ 57%] Built target glfw
+[ 72%] Built target imgui
+[ 74%] Linking CXX executable baikonur
+[100%] Built target baikonur
+[100%] Built target baikonur_resources

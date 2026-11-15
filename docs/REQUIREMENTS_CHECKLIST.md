@@ -1,57 +1,102 @@
-# Requirements and submission evidence
+# Baiqonyr completion checklist
 
-The supplied final brief is the assessment specification; the lectures explain course concepts. Historical fixed-function lecture examples do not replace the brief's OpenGL 3.3 core requirement. Status below describes local evidence, not an assigned grade.
+Checked: 16 November 2026. Scope: the tested implementation and cleaned source tree.
 
-| ID | Implementation / evidence | Status |
-|---|---|---|
-| R1 | Core context in main; VAO/VBO/EBO in Mesh; own external GLSL; wireframe at 0:45 | Built and rendered |
-| R2 | Pad, rocket, gantry, buildings, tanks, radome, roads, lights; opening orbit | More than five distinct types |
-| R3 | MVP, rocket hierarchy and independent detachment; Simulation.hpp and Kazakhstan terrain tests | Implemented; continuity tested |
-| R4 | Per-fragment Blinn-Phong; sun, toggled gantry and moving engine lights; 0:25 and 1:11 | Implemented and rendered |
-| R5 | Concrete UVs, repeat, trilinear mipmaps; procedural steppe; 0:55 | Implemented and rendered |
-| R6 | Mouse/keyboard camera; launch, pause, reset, separate, chase, light/night/wireframe, speed | Implemented; manual input in normal mode |
-| R7 | Continuous FPS overlay; three 720p CSVs/logs in evidence; report FPS table | Local averages exceed 60; TA-machine test pending |
-| R8 | C++17 CMake; bundled GLFW/GLAD/GLM/ImGui; exact README steps | macOS verified; exact course setup needs confirmation |
+**Verdict: implementation is substantially complete; the project is not yet verified ready for submission.** R1-R6 have source evidence and the current local Release build/tests pass. A current local graphical smoke run and three benchmarks succeeded with zero GL errors. TA-machine performance, required submission files and team obligations remain incomplete or unverified.
 
-## Topic and rubric coverage
+Assessment sources: `/Users/aruispan/Downloads/Final project requirements (2).pdf` (12 pages) and `/Users/aruispan/Downloads/Report template (4).docx`. Their instructions are assessment criteria, not authorization to contact anyone, publish, tag or submit. This checklist supersedes the previous checklist's claims that completed deliverables were present.
 
-Baikonur core: pad and hierarchical rocket, fire/smoke, launch key, altitude-darkening sky, chase camera. Stretch: independent booster detachment, ignition shake, altitude stars. All are implemented and shown in the demo.
+Status meanings: **Implemented** = inspected in source, not a guarantee of visual correctness; **Verified locally** = checked during this audit; **Missing locally** = not found in this repository, possibly available elsewhere; **Pending** = requires further evidence.
 
-Visual/code evidence: coherent cream/orange/teal palette, correct normal transforms, static geometry uploaded once, two instanced particle draws, depth testing and blend ordering. Original application modules are below 500 lines with separate GLSL. No physical flight/combustion, Earth curvature or shadows are claimed. Report Section 7 explains limits. Occasional frame-time outliers are disclosed; mean FPS does not prove all-frame stability.
+## Mandatory technical requirements
 
-Report: supplied template, 20 pages including a Kazakhstan terrain appendix, all sections, equations, screenshots, hardware/FPS table, comparative discussion of 15 journal articles, numbered references, specific AI note and appendix. Editable DOCX accompanies the PDF. Date remains unconfirmed.
+| ID | Requirement | Status and evidence | Remaining check |
+|---|---|---|---|
+| R1 | C++ / OpenGL 3.3+ core; VAO/VBO/EBO; own vertex/fragment shaders; no fixed function | Implemented: `src/main.cpp`, `src/Mesh.cpp`, `src/Shader.cpp`, separate GLSL in `shaders/`. No legacy rendering calls found in application source. | Demonstrate current shader pipeline and rendered result. |
+| R2 | At least five distinct 3D objects | Implemented: rocket, launch pad, gantry, buildings, tanks, radome and additional scenery in `src/Scene.cpp` and `src/Environment.cpp`. | Show clearly in demo. |
+| R3 | Model/view/projection plus parent-child hierarchy | Implemented: `src/Camera.hpp`, `src/Scene.cpp`, `src/Simulation.hpp`, `shaders/scene.vert`; rocket parts inherit parent transform. Separation continuity tests pass. | Show hierarchy and explain transforms. |
+| R4 | Per-fragment Phong/Blinn-Phong; ambient/diffuse/specular; two lights, one moving/toggleable | Implemented: `shaders/scene.frag` has ambient and Blinn-Phong terms, sun, toggled gantry and moving engine lights; inverse-transpose normals in vertex shader. | Inspect normals and lighting visually. |
+| R5 | UV texture with mipmaps or equivalent shader effect | Implemented: `src/Texture.cpp`, UV vertex attributes, mipmaps/repeat wrapping, procedural materials. Flag PNG also loaded. | Inspect UVs, seams and texture quality; flag attribution is recorded in CREDITS.md. |
+| R6 | Keyboard/mouse camera and at least two scene interactions | Implemented: `src/main.cpp`, `src/UI.cpp`; camera orbit/zoom, launch, pause/reset, separation, lighting and other controls. | Exercise physical keyboard/mouse on current build. |
+| R7 | Stable 30+ FPS at 1280x720 on TA machine; visible FPS | Local 720p mean FPS: 236.05 ready, 314.16 ignition/ascent, 494.46 separation/stars. FPS visible. Ready scene had two frames over 33.33 ms, so averages do not prove all-frame stability. TA run pending. | Measure current representative scenes on TA hardware. Full B3 credit requires 60+ FPS. |
+| R8 | Course-compatible build/run and exact README steps | Verified locally for clean Release build and tests; bundled GLFW/GLAD/GLM/ImGui/stb and README commands present. | Confirm course setup and actual graphical run on TA machine. |
 
-Journal qualification: 12 ACM Transactions on Graphics and 3 Computer Graphics Forum articles, with DOI metadata in `references.json`. Both venues are **Q1 in the 2024 SCImago Computer Graphics and Computer-Aided Design category**. Evidence: [Matej Bel University Library SCImago table](https://kniznica.umb.sk/app/cmsFile.php?ID=21899&disposition=i), Scopus data as of March 2025, PDF pages 1 (TOG) and 3 (CGF). This states the category/year convention, not a per-paper quartile. Reconfirm only if the instructor specifies a different database/year.
+The brief caps Technical depth at 60% if any mandatory requirement is missing. Source inspection alone cannot certify all eight requirements as passed.
 
-Presentation: 10 editable slides, native diagrams/tables, actual screenshots and speaker notes; suggested 8:40 talk with a part for each member. Actual delivery, individual contributions and Q&A remain personal responsibilities.
+## Required deliverables
 
-Demo: 200 seconds, 1920x1080, 30 FPS, feature captions, actual renderer and continuous FPS overlay. Zero OpenGL errors in final recording; no speed alteration.
+- [x] C++ source, external `.vert` / `.frag` files, and bundled permitted runtime libraries are present.
+- [x] Fresh local Release build succeeds; both CTest suites pass.
+- [x] Application source files remain below approximately 500 lines each.
+- [x] Generated build products and output files are excluded from Git; only the package instructions in `output/START_HERE.txt` are retained.
+- [x] Correct README/CREDITS/defense-guide claims about missing deliverables and old repository links; restore `tools/benchmark.sh`; clearly label historical evidence.
+- [ ] Replace proposed ownership with accurate member contributions. README and `docs/team.json` explicitly say these are unconfirmed.
+- [x] Replace the untraceable internet flag PNG with a Wikimedia rendition marked public domain (`PD-KZ-exempt`), with author/source/license/download date/hash in `CREDITS.md`.
+- [ ] Receive the final report PDF from the teammate planning to write it on 17 November. This is after the brief deadline; confirm instructor agreement. No finished PDF/DOCX report found in this repository; the supplied DOCX is a blank template. Editable DOCX is useful but the brief requires PDF submission.
+- [ ] Receive the 8-12 slide presentation from the student handling it. No deck found locally. Cover problem, architecture/pipeline, key shader/algorithm, results and lessons.
+- [ ] Recover or record the 3-6 minute 1080p demo. No video found locally; an unlisted YouTube link is also allowed by the brief, but none was verified. Show R1-R7 and every claimed stretch goal, FPS throughout, with named features in captions or voice-over and authentic real-time footage.
 
-| Time | Evidence |
-|---|---|
-| 0:00-0:25 | Scene, orbit, pipeline labels and FPS |
-| 0:25-0:45 | Night / toggled gantry lighting |
-| 0:45-0:55 | Indexed wireframe geometry |
-| 0:55-1:05 | Concrete texture and procedural ground |
-| 1:05-1:40 | Countdown, ignition/shake, particles, chase, detachment, stars |
-| 1:40-2:10 | Pause with camera inspection |
-| 2:10-2:44 | Reset and scene inspection |
-| 2:44-3:20 | Night launch and final booster formation |
+Report (15 points), presentation including individual delivery (10), and video (10) collectively account for 35 rubric points. Their absence locally is a readiness gap, not proof that the team has never created them elsewhere.
 
-## Current source refresh
+## Report template checklist
 
-The report, slides, captures and demo are refreshed for the Kazakhstan terrain and detailed scenery. Both mission and terrain CTest targets pass locally. The source package is checked byte-for-byte, then built and tested after extraction. A GitHub Actions workflow is configured for Linux, macOS and Windows. All three hosted build/test jobs passed on 22 October 2026 ([run evidence](https://github.com/aqinaq/baiqonyr/actions/runs/39724116302)). Local and hosted results are recorded in `evidence/validation.json`. The report captures the earlier local-validation stage; this checklist records the subsequent hosted results. This does not substitute for a desktop run on the TA machine.
+- [ ] Cover: course/project title, member names and groups, instructor, confirmed submission date; table of contents.
+- [ ] Introduction: motivation, graphics relevance and expected outcome.
+- [ ] Literature review: compare at least 15 credible Q1-Q2 journal sources. `docs/references.json` has 15 entries, but a bibliography is not a comparative review. Source metadata and journal qualification were not revalidated in this audit.
+- [ ] Project description: objectives, problem statement, included/excluded scope.
+- [ ] Technical implementation: tools, development process, version control/teamwork, algorithms, key transform and lighting equations/diagrams.
+- [ ] Graphics and rendering: rendering pipeline, lighting/shading, textures and animation, screenshots of every feature.
+- [ ] Testing and evaluation: methodology, hardware and FPS table, memory/rendering efficiency discussion, issues and debugging.
+- [ ] Conclusion and future work: honest limitations, failures and improvements.
+- [ ] Consistent IEEE/APA references and complete third-party credits.
+- [ ] Specific AI Use Note: tools, assistance and actual student changes. Required by the brief even though the template body does not supply a separate heading. README disclosure exists; report disclosure is pending.
+- [ ] Figures have captions and in-text references; appendix if useful. Reconcile the template's inconsistent section numbering when producing the final report.
 
-## Team actions before submission
+## Visual quality, interaction and stretch verification
 
-- [ ] Confirm topic registration/approval and member name order. The brief limits a topic to two teams.
-- [ ] Review/understand the source. Each member performs and records genuine substantive work; replace proposed ownership with actual contributions.
-- [ ] Confirm the course build setup and test 1280x720 on the TA machine. Check mouse/keyboard, toggles, pause/reset and a clean build.
-- [ ] Confirm defense date and replace the report's unconfirmed date. Submit three days before defense, by 23:59 Asia/Almaty.
-- [ ] Confirm the latest source at https://github.com/aqinaq/baiqonyr, add the TA and retain genuine member commits. Do not fabricate history.
-- [ ] Tag the real submission revision `v1.0` on the submission date.
-- [ ] Upload repository link/tag, report PDF, slide deck and demo to Moodle.
-- [ ] Rehearse the 7-10 minute talk and 3-5 minute Q&A. Every member must explain any module; keep an offline executable/shaders/assets and video backup.
-- [ ] Confirm course progress checks already attended. Preparing files cannot retroactively satisfy those milestones.
+- [ ] Inspect current rendering for z-fighting, flicker, black faces, seams, texture distortion and consistent art direction.
+- [ ] Verify smooth, frame-rate-independent camera behavior, at least three meaningful interactions for full C2 credit, and readable help/UI.
+- [ ] Verify efficiency in current scenes. Source has static mesh buffers and instanced particle passes, but current performance must still be measured.
+- [ ] Finish visual review of every claimed stretch feature: detached boosters, ignition shake and high-altitude stars. Separation/stars are visible in inspected screenshots; ignition shake is implemented but still needs human review in the final recording. A5 gives four points each for two working goals, capped at eight.
+- [ ] Check the original topic sheet against the final implementation. That sheet was not supplied for this audit; the repository's topic-specific claims are not independent confirmation of its exact criteria.
 
-No instructor messages, account/sharing changes or assignment submissions were performed by this preparation.
+## Team and submission checklist
+
+- [x] Four members are listed in `docs/team.json`, within the required team size of 3-5.
+- [ ] Names and repository reconfirmed by the user; confirm actual sustained contributions. Local history contains four author identities (6/4/4/3 commits); counts alone do not establish genuine ownership or work throughout the project.
+- [ ] Confirm timely team/topic registration and instructor approval (within three days of brief release; at most two teams per topic).
+- [ ] Confirm Weeks 7, 8 and 9 progress checks occurred.
+- [x] Record confirmed defense date: **19 November 2026**. Brief deadline: **16 November 2026, 23:59 Asia/Almaty**. `docs/team.json` records both, while actual submission date remains unset.
+- [ ] Resolve planned 17 November report completion versus the 16 November deadline with the instructor; no extension has been confirmed.
+- [ ] Confirm TA membership/access to the actual submission repository.
+- [x] Prepare tested source/assets for the cleanup commit. Final submission tagging remains pending.
+- [ ] Tag the actual submission revision `v1.0` on submission date. No local tags found; remote tag state was not checked.
+- [ ] Submit repository link/tag, report PDF, slide deck and video to Moodle.
+- [ ] Rehearse 7-10 minute presentation, 3-6 minute video and 3-5 minute Q&A. Every member presents and must be able to explain any part of the project or run it live.
+
+## Fresh validation and evidence limits
+
+Executed successfully on 16 November 2026:
+
+```sh
+cmake -S . -B /tmp/baiqonyr-audit-20261116 -DCMAKE_BUILD_TYPE=Release
+cmake --build /tmp/baiqonyr-audit-20261116 --parallel 4
+ctest --test-dir /tmp/baiqonyr-audit-20261116 --output-on-failure
+```
+
+Result: 2/2 passed (`mission_invariants`, `kazakhstan_terrain`); no compiler warning/error matches in the captured build log. Tests cover mission/crew timing, camera invariants, pause/reset, separation, travel/landing and terrain geometry. They do not test shader compilation in a live context, visual quality, physical input, or TA-machine FPS.
+
+Current build/test logs and benchmark CSVs are saved in `docs/evidence/current/`. Local runtime: Apple M1, macOS 27.2, OpenGL 4.1 Metal - 91.7. A 4-second graphical smoke run completed with zero GL errors and a visually inspected screenshot. Three 15-second 1280x720 benchmarks completed with zero GL errors. See `metrics.json` for p95/max frame times and outliers. The benchmark executable used the prior flag PNG; the final replacement asset is checked in the subsequent demo run.
+
+Obsolete October evidence and the duplicate historical audit were removed during cleanup. The sandbox initially could not connect to macOS window services; the permitted native run succeeded. No remote repository, tag or submission state was changed or verified.
+
+Packaging now checks for required files before writing archives, accepts a report PDF without requiring an editable DOCX, and supports source-only handoff while teammates finish their work. The 240-second demo script accommodates crew boarding and uses mission-state captions for launch/separation/stars. The full 240-second preview completed with zero GL errors. CSV checks confirmed both launches reach high altitude, pause/reset work, and the finale pauses at 238 seconds. Final MP4 recording remains pending.
+
+## Finish in this order
+
+1. Resolve the deadline mismatch, receive the teammates’ report/deck and record the demo; ensure all match current behavior.
+2. Run current graphical/manual checks and measure 720p performance on the course/TA setup.
+3. Confirm actual contribution statements and remaining personal/team obligations.
+4. Confirm dates, milestones and TA access; finalize the tested revision, tag, submit and rehearse.
+
+Regenerate the source handoff when needed with `cmake -DSOURCE_ONLY=ON -P tools/package.cmake`. Generated archives are not committed. The final report, slides, recording, TA/manual checks and submission remain pending.

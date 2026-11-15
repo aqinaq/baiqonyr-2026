@@ -4,5 +4,5 @@ tmp/
 imgui.ini
 *.ppm
 *.rgb
-output/*.mp4
-output/*.zip
+output/*
+!output/START_HERE.txt

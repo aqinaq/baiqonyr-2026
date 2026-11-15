@@ -1,10 +1,10 @@
 #version 330 core
-in vec3 worldPos,normal;in vec2 uv;
+in vec3 worldPos,normal,localPos;in vec2 uv;
 out vec4 fragColor;
 uniform vec3 baseColor,eye,sunDir,enginePos;
 uniform float shininess,emission,enginePower,night,altitude,time,flagReveal;
 uniform int material,lightsOn;
-uniform sampler2D concrete;
+uniform sampler2D concrete,flagTexture;
 float groundHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float groundNoise(vec2 p){
  vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
@@ -35,13 +35,45 @@ vec3 illuminate(vec3 n,vec3 v,vec3 l,vec3 color,float strength){
  float s=d>0.0?pow(max(dot(n,normalize(l+v)),0.0),shininess):0.0;
  return strength*color*(baseColor*d+vec3(.34)*s);
 }
+// Small original stencil glyphs for the AITU Aerospace / NSH-119 hull markings.
+int brandGlyph(int c,int row){
+ if(c==0)return int[7](14,17,17,31,17,17,17)[row]; // A
+ if(c==1)return int[7](31,4,4,4,4,4,31)[row]; // I
+ if(c==2)return int[7](31,4,4,4,4,4,4)[row]; // T
+ if(c==3)return int[7](17,17,17,17,17,17,14)[row]; // U
+ if(c==4)return int[7](17,25,25,21,19,19,17)[row]; // N
+ if(c==5)return int[7](15,16,16,14,1,1,30)[row]; // S
+ if(c==6)return int[7](17,17,17,31,17,17,17)[row]; // H
+ if(c==7)return int[7](0,0,0,31,0,0,0)[row]; // dash
+ if(c==8 || c==9)return int[7](4,12,4,4,4,4,14)[row]; // 1
+ return int[7](14,17,17,15,1,1,14)[row]; // 9
+}
+float rocketName(vec2 p){
+ if(p.x<0.0 || p.x>=1.0 || p.y<0.0 || p.y>=1.0)return 0.0;
+ float cell=p.x*7.0;
+ int index=min(6,int(floor(cell)));
+ int column=int(floor(fract(cell)*6.0));
+ if(column>=5)return 0.0;
+ int row=min(6,int(floor((1.0-p.y)*7.0)));
+ return float((brandGlyph(index+4,row)>>(4-column))&1);
+}
 void main(){
+ if(material==20 && localPos.x<-.7 && abs(localPos.z)<.52 &&
+    localPos.y>(5.6-8.2)/12.0 && localPos.y<(8.0-8.2)/12.0) discard;
+ if(material==22 && localPos.z>.45 && abs(localPos.x)<.80 && localPos.y>-.22 && localPos.y<.43) discard;
  vec3 n=normalize(normal),v=normalize(eye-worldPos);
  if(material==5){
   float granules=groundNoise(uv*170.0)*.55+groundNoise(uv*47.0)*.45;
   float limb=pow(max(dot(n,v),0.0),.4);
   vec3 solar=mix(vec3(.65,.12,.015),vec3(1.0,.76,.3),granules*.6+limb*.4);
   fragColor=vec4(solar,1);return;
+ }
+ if(material==21){
+  vec4 flag=texture(flagTexture,uv);
+  if(flag.a<.1) discard;
+  // Keep the national colours legible from either side of the supported cloth.
+  float light=.72+.28*abs(dot(n,normalize(sunDir)));
+  fragColor=vec4(flag.rgb*light,1);return;
  }
  vec3 albedo=baseColor;
  if(material==6 || material==7){
@@ -57,8 +89,10 @@ void main(){
  if(material>=10 && material<=18){
   float broad=surfaceNoise(n*7.0),detail=surfaceNoise(n*85.0);
   if(material==10 || material==11 || material==16){
-   albedo*=.55+broad*.65+detail*.22;
-   for(int i=0;i<28;i++){
+   float regolith=surfaceNoise(n*320.0);
+   float strata=sin(n.y*120.0+surfaceNoise(n*18.0)*6.0)*.035;
+   albedo*=.47+broad*.65+detail*.28+regolith*.16+strata;
+   for(int i=0;i<44;i++){
     float f=float(i)+float(material)*17.0;
     vec3 center=normalize(vec3(sin(f*12.3),cos(f*7.13),sin(f*4.79)));
     float r=.025+.075*groundHash(vec2(f,2));
@@ -83,6 +117,18 @@ void main(){
   }
  }
 
+ if(material==20){
+  float seam=1.0-smoothstep(.003,.008,min(fract(uv.x*12.0),1.0-fract(uv.x*12.0)));
+  float panel=1.0-smoothstep(.003,.009,min(fract(uv.y*8.0),1.0-fract(uv.y*8.0)));
+  albedo*=1.0-.13*seam-.10*panel;
+  albedo*=.96+.04*groundNoise(uv*vec2(140,380));
+  // Four painted copies, each rotated as a whole word to read bottom-to-top.
+  float across=(1.0-fract(uv.x*4.0)-.175)/.65;
+  float upward=(uv.y-.51)/.43;
+  float label=rocketName(vec2(upward,1.0-across));
+  albedo=mix(albedo,vec3(.008,.018,.025),label);
+
+ }
  if(material==1)albedo*=texture(concrete,uv*8.0).rgb;
  if(material==2){
 
@@ -104,13 +150,15 @@ void main(){
   float bands=sin(uv.y*90.0+groundNoise(uv*17.0)*4.0)*.12;
   albedo*=.7+groundNoise(uv*90.0)*.35+bands;
  }
- vec3 lit=albedo*mix(.23,.07,night);
- lit+=illuminate(n,v,normalize(sunDir),mix(vec3(1.0,.78,.52),vec3(.24,.36,.65),night),.92)*(albedo/max(baseColor,vec3(.01)));
+ bool celestial=material>=10 && material<=19;
+ vec3 lightDirection=celestial ? normalize(vec3(-3600,6000,-6250)-worldPos) : normalize(sunDir);
+ vec3 lit=albedo*(celestial ? .012 : mix(.23,.07,night));
+ lit+=illuminate(n,v,lightDirection,celestial ? vec3(1.0,.94,.84) : mix(vec3(1.0,.78,.52),vec3(.24,.36,.65),night),.92)*(albedo/max(baseColor,vec3(.01)));
  vec3 delta=enginePos-worldPos;float d=length(delta);
  lit+=illuminate(n,v,normalize(delta+vec3(0,.001,0)),vec3(1,.3,.045),enginePower/(1+.045*d+.015*d*d));
  if(lightsOn==1){vec3 lamp=vec3(-8,17,5)-worldPos;float r=length(lamp);lit+=illuminate(n,v,normalize(lamp),vec3(.52,.8,1),4.0/(1+.05*r+.025*r*r));}
  lit+=albedo*emission;
- float fog=1-exp(-length(eye-worldPos)*.0014*(1-altitude));
+ float fog=1-exp(-length(eye-worldPos)*.00055*(1-altitude));
  lit=mix(lit,mix(vec3(.57,.44,.3),vec3(.025,.04,.075),night),fog);
  vec3 color=pow(max(lit,vec3(0)),vec3(1.0/2.2));
  // Reveal the country-sized flag only on the map's top surface during ascent.

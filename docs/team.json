@@ -1,12 +1,30 @@
 {
   "members": [
-    {"name":"Akbope Bakytkeldy","group":"SE2426"},
-    {"name":"Moldir Omar","group":"SE2426"},
-    {"name":"Ayaulym Talgat","group":"SE2427"},
-    {"name":"Talant Altaikhan","group":"SE2425"}
+    {
+      "name": "Akbope Bakytkeldy",
+      "group": "SE2426"
+    },
+    {
+      "name": "Moldir Omar",
+      "group": "SE2426"
+    },
+    {
+      "name": "Ayaulym Talgat",
+      "group": "SE2427"
+    },
+    {
+      "name": "Talant Altaikhan",
+      "group": "SE2425"
+    }
   ],
-  "instructor":"Nazira Shaimerdenova",
-  "defense_date":null,
-  "submission_date":null,
-  "contributions_status":"Proposed ownership only; members must confirm actual contributions."
+  "instructor": "Nazira Shaimerdenova",
+  "defense_date": "2026-11-19",
+  "submission_date": null,
+  "contributions_status": "Proposed ownership only; members must confirm actual contributions.",
+  "submission_deadline": "2026-11-16T23:59:00+05:00",
+  "topic": "Baiqonyr",
+  "repository": "https://github.com/aqinaq/baiqonyr-2026",
+  "report_status": "Another student plans to write the report on 2026-11-17.",
+  "slides_status": "Another student is handling slides.",
+  "demo_status": "Recording pending."
 }

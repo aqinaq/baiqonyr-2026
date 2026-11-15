@@ -1,0 +1,35 @@
+{
+  "checked_on": "2026-11-16",
+  "hardware": {
+    "gpu": "Apple M1",
+    "os": "macOS 27.2",
+    "opengl": "4.1 Metal - 91.7",
+    "resolution": "1280x720",
+    "vsync": false,
+    "retina": false
+  },
+  "timing": "Frame-loop wall time, including swaps; first two seconds excluded. Local machine, not TA machine.",
+  "scenes": {
+    "ready": {
+      "frames": 3068,
+      "mean_fps": 236.05,
+      "p95_ms": 5.213,
+      "max_ms": 95.293,
+      "frames_over_33_33_ms": 2
+    },
+    "ignition_and_ascent": {
+      "frames": 4084,
+      "mean_fps": 314.16,
+      "p95_ms": 5.321,
+      "max_ms": 21.201,
+      "frames_over_33_33_ms": 0
+    },
+    "separation_and_stars": {
+      "frames": 6428,
+      "mean_fps": 494.46,
+      "p95_ms": 4.224,
+      "max_ms": 20.826,
+      "frames_over_33_33_ms": 0
+    }
+  }
+}

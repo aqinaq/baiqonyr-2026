@@ -39,13 +39,13 @@ void setupUI(const std::string &fontPath) {
 void directDemo(double t, Mission &m, Camera &c, Scene &s, Particles &p) {
     // Timed input choreography; rendering and simulation still use real wall-clock dt.
     static int previous = -1;
-    int stage = t < 25 ? 0 : t < 45 ? 1 : t < 65 ? 2 : t < 100 ? 3 : t < 130 ? 4 : t < 164 ? 5 : 6;
+    int stage = t < 25 ? 0 : t < 45 ? 1 : t < 65 ? 2 : t < 135 ? 3 : t < 155 ? 4 : t < 175 ? 5 : 6;
     if (stage != previous) {
         if (stage == 0 || stage == 5) {
             m.reset();
             p.reset();
             c.chase = false;
-            c.distance = 44;
+            c.distance = 64;
             c.pitch = .2f;
             s.night = false;
             s.wireframe = false;
@@ -64,7 +64,7 @@ void directDemo(double t, Mission &m, Camera &c, Scene &s, Particles &p) {
             p.reset();
             m.launch();
             c.chase = true;
-            c.distance = 42;
+            c.distance = 62;
             c.pitch = .12f;
         }
         if (stage == 4) {
@@ -78,7 +78,7 @@ void directDemo(double t, Mission &m, Camera &c, Scene &s, Particles &p) {
             m.launch();
             s.night = true;
             c.chase = true;
-            c.distance = 43;
+            c.distance = 63;
             c.pitch = .12f;
         }
         previous = stage;
@@ -92,48 +92,34 @@ void directDemo(double t, Mission &m, Camera &c, Scene &s, Particles &p) {
         c.distance = std::min(110.f, 55.f + (m.clock - 22) * 9.f);
         c.pitch = .12f - .47f * std::clamp((m.clock - 22) / 2.f, 0.f, 1.f);
     }
-    if (t >= 198)
+    if (t >= 238)
         m.paused = true;
     // Main applies frame-independent orbit using elapsed wall time.
 }
 static void destinationUI(Mission &m, Camera &c, UIState &ui) {
     const auto size = ImGui::GetIO().DisplaySize;
-    ImGui::SetNextWindowPos({0,0});
-    ImGui::SetNextWindowSize(size);
-    ImGui::Begin("Choose destination", nullptr, ImGuiWindowFlags_NoDecoration |
-                 ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoSavedSettings);
-    ImGui::SetCursorPos({20,16});
-    ImGui::TextUnformatted("CHOOSE YOUR DESTINATION");
-    ImGui::SetCursorPos({20,42});
-    ImGui::TextDisabled("Click a planet to travel. Moon, Mars and Mercury allow landing.");
-    int chosen = -1;
-    for (int i=0; i<destinationCount; ++i) {
-        const auto &d = destinations[i];
-        glm::vec4 clip = c.viewProjection * glm::vec4(d.center,1);
-        if (clip.w <= 0) continue;
-        glm::vec3 ndc = glm::vec3(clip)/clip.w;
-        ImVec2 center((ndc.x*.5f+.5f)*size.x, (.5f-ndc.y*.5f)*size.y);
-        glm::vec4 edge = c.viewProjection * glm::vec4(d.center + glm::vec3(std::max(d.radius,260.f),0,0),1);
-        float radius = std::max(16.f, std::abs(edge.x/edge.w-ndc.x)*size.x*.5f);
-        ImGui::PushID(i);
-        ImGui::SetCursorPos({center.x-radius-8,center.y-radius-8});
-        if (ImGui::InvisibleButton("planet",{2*radius+16,2*radius+16})) chosen=i;
-        if (ImGui::IsItemHovered()) {
-            ImGui::GetWindowDrawList()->AddCircle(center,radius+6,IM_COL32(70,230,255,255),48,2);
-            ImGui::SetTooltip("%s",d.warning);
-        }
-        ImVec2 text = ImGui::CalcTextSize(d.name);
-        ImGui::SetCursorPos({center.x-text.x*.5f-8,center.y+radius+9});
-        if (ImGui::SmallButton(d.name)) chosen=i;
-        ImGui::PopID();
+    auto *draw=ImGui::GetBackgroundDrawList();
+    int chosen=-1;
+    for(int i=0;i<destinationCount;++i) {
+        const auto &d=destinations[i];
+        glm::vec4 clip=c.viewProjection*glm::vec4(d.center,1);
+        if(clip.w<=0) continue;
+        glm::vec3 ndc=glm::vec3(clip)/clip.w;
+        if(std::abs(ndc.x)>1 || std::abs(ndc.y)>1 || ndc.z>1) continue;
+        ImVec2 center((ndc.x*.5f+.5f)*size.x,(.5f-ndc.y*.5f)*size.y);
+        ImVec2 mouse=ImGui::GetIO().MousePos;
+        bool hover=std::hypot(mouse.x-center.x,mouse.y-center.y)<24;
+        draw->AddCircle(center,hover?22.f:14.f,IM_COL32(90,185,205,160),32,1.f);
+        draw->AddText({center.x+19,center.y-7},IM_COL32(200,220,230,210),d.name);
+        if(hover && !ImGui::GetIO().WantCaptureMouse && ImGui::IsMouseClicked(0)) chosen=i;
     }
-    ImGui::End();
     if (chosen >= 0) {
         ui.routeBlocked = !m.selectDestination(chosen);
         if (!ui.routeBlocked) {
-            c.chase=true; c.distance=85; c.pitch=.25f;
+            c.chase=true; c.distance=85;
+            if(!c.firstPerson) c.pitch=.25f;
             glm::vec3 approach=glm::normalize(m.route[1]-m.route[0]);
-            c.yaw=std::atan2(-approach.x,-approach.z)+.4f;
+            if(!c.firstPerson) c.yaw=std::atan2(-approach.x,-approach.z)+.4f;
         }
     }
 }
@@ -143,6 +129,8 @@ static void gameplayUI(Mission &m, Camera &c, Scene &s, UIState &ui) {
     ImGui::SetNextWindowBgAlpha(.25f);
     ImGui::Begin("HUD toggle", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
     if (ImGui::SmallButton(ui.panel ? "Hide controls" : "Flight controls")) ui.panel=!ui.panel;
+    ImGui::SameLine();
+    if(ImGui::SmallButton(c.firstPerson ? "First person [C]" : "Third person [C]")) c.firstPerson=!c.firstPerson;
     ImGui::SameLine(); ImGui::TextDisabled("%.0f FPS",ui.fps);
     ImGui::End();
     if (!ui.panel) return;
@@ -152,10 +140,11 @@ static void gameplayUI(Mission &m, Camera &c, Scene &s, UIState &ui) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10,8));
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6,4));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(6,4));
-    if (ImGui::Begin("Baikonur | Flight controls", &ui.panel, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::Begin("AITU | NSH-119 Flight controls", &ui.panel, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::SetWindowFontScale(.9f);
+        ImGui::TextColored({.35f,.85f,.87f,1},"AITU AEROSPACE / NSH-119");
         if (m.flight==Flight::Choosing) {
-            ImGui::TextColored({.2f,.8f,.95f,1},"KAZAKHSTAN / HOME");
+            ImGui::TextColored({.2f,.8f,.95f,1},"CHOOSE YOUR DESTINATION");
             static int selected=0;
             ImGui::SetNextItemWidth(165);
             if (ImGui::BeginCombo("Route",destinations[selected].name)) {
@@ -168,24 +157,45 @@ static void gameplayUI(Mission &m, Camera &c, Scene &s, UIState &ui) {
                                "%s risk",destinations[selected].dangerous ? "High" : "Low");
             if (ImGui::Button("Travel")) {
                 if (m.selectDestination(selected)) {
-                    c.chase=true; c.distance=85; c.pitch=.25f;
+                    c.chase=true; c.distance=85;
+                    if(!c.firstPerson) c.pitch=.25f;
                     glm::vec3 approach=glm::normalize(m.route[1]-m.route[0]);
-                    c.yaw=std::atan2(-approach.x,-approach.z)+.4f;
+                    if(!c.firstPerson) c.yaw=std::atan2(-approach.x,-approach.z)+.4f;
                     ui.routeBlocked=false;
                 } else ui.routeBlocked=true;
             }
             ImGui::SameLine(); ImGui::TextDisabled("Choose your next stop");
             if (ui.routeBlocked) ImGui::TextWrapped("Route blocked. Choose another destination.");
         } else if (m.flight==Flight::Transit) {
-            ImGui::Text("%s / %s",m.canLand() && m.progress()>.75f ? "Landing" : "En route",destinations[m.destination].name);
+            ImGui::Text("%s / %s",m.departure>0 ? "Preparing departure" : m.canLand() && m.progress()>.75f ? "Landing" : "En route",destinations[m.destination].name);
             ImGui::ProgressBar(m.progress(),{-1,5},"");
             ImGui::Text("Shield %.0f%%  |  %.0f%% complete",100*(1-m.danger()),100*m.progress());
             if (m.danger()>.35f) ImGui::TextColored({1,.65f,.25f,1},"Rising heat / unstable signal");
         } else if (m.flight==Flight::Arrived || m.flight==Flight::Destroyed) {
-            if (!m.resultReady()) ImGui::TextDisabled("Receiving telemetry...");
+            if(m.surfaceLanded() && m.aftermath<Mission::ceremonyDuration)
+                ImGui::TextDisabled("%s",m.aftermath<2.5f ? "Touchdown / opening hatch..." :
+                    m.aftermath<Mission::flagPlantStart ? "Five crew members disembarking..." : m.aftermath<Mission::flagUnfurlStart ? "Planting Kazakhstan flag..." : "Unfurling flag...");
+            else if (!m.resultReady()) ImGui::TextDisabled("Receiving telemetry...");
             else {
                 ImGui::TextColored(m.flight==Flight::Arrived ? ImVec4(.4f,.9f,.75f,1) : ImVec4(1,.6f,.3f,1),
                                    "%s",m.flight==Flight::Arrived ? (m.canLand() ? "Landed safely / crew safe" : "Stable orbit / crew safe") : "Signal lost / mission ended");
+                if(m.canContinue()) {
+                    static int next=0;
+                    if(next==m.destination) next=(next+1)%destinationCount;
+                    ImGui::TextUnformatted("Continue your journey");
+                    ImGui::SetNextItemWidth(165);
+                    if(ImGui::BeginCombo("Next planet",destinations[next].name)) {
+                        for(int i=0;i<destinationCount;++i)
+                            if(i!=m.destination && ImGui::Selectable(destinations[i].name,next==i)) next=i;
+                        ImGui::EndCombo();
+                    }
+                    ImGui::TextWrapped("%s",destinations[next].warning);
+                    if(ImGui::Button("Travel to next planet")) {
+                        ui.routeBlocked=!m.selectDestination(next);
+                        if(!ui.routeBlocked) { c.chase=true; c.distance=75; }
+                    }
+                    if(ui.routeBlocked) ImGui::TextWrapped("No clear route. Choose another planet.");
+                }
                 if (ImGui::Button("Back to Kazakhstan")) ui.reset=true;
             }
         } else {
@@ -198,11 +208,17 @@ static void gameplayUI(Mission &m, Camera &c, Scene &s, UIState &ui) {
             if (ImGui::SmallButton(m.paused ? "Resume [P]" : "Pause [P]")) m.paused=!m.paused;
         } else ImGui::SameLine();
         if (!m.inSpace()) { if (ImGui::SmallButton("Reset [R]")) ui.reset=true; }
+        if(!m.running && ImGui::Button(c.siteOverview ? "Rocket close-up [V]" : "Explore Baikonur site [V]")) c.toggleSite();
+        if(!m.running && ImGui::Button(c.landmarkView ? "Back to rocket [J]" : "Visit BAIQONYR sign [J]")) c.toggleLandmark();
         ImGui::SetNextItemWidth(230);
         ImGui::SliderFloat("Speed",&m.speed,.25f,20.f,"%.2fx",ImGuiSliderFlags_Logarithmic|ImGuiSliderFlags_AlwaysClamp);
         if (ImGui::CollapsingHeader("Camera & settings")) {
-            ImGui::TextWrapped("Drag / WASD: look around. Scroll: zoom. Drag this panel by its title to move it.");
-            ImGui::Checkbox("Chase camera [C]",&c.chase);
+            ImGui::TextWrapped("Drag / WASD: look around. Scroll or Q/E: zoom out/in. Drag this panel by its title to move it.");
+            if(ImGui::Button("Zoom in [E]")) c.zoom(2.f);
+            ImGui::SameLine();
+            if(ImGui::Button("Zoom out [Q]")) c.zoom(-2.f);
+            ImGui::Checkbox("First person [C / 1]",&c.firstPerson);
+            ImGui::TextDisabled("3: third-person chase (default)");
             ImGui::Checkbox("Shake [K]",&c.shake); ImGui::SameLine(); ImGui::Checkbox("Night [N]",&s.night);
             ImGui::Checkbox("Wireframe [F]",&s.wireframe);
             if (ImGui::Button("Restart mission")) ui.reset=true;
@@ -213,8 +229,17 @@ static void gameplayUI(Mission &m, Camera &c, Scene &s, UIState &ui) {
 }
 void drawUI(Mission &m, Camera &c, Scene &s, const Particles &p, UIState &ui) {
     if (!ui.demo) {
+        if(c.firstPerson) {
+            auto size=ImGui::GetIO().DisplaySize;
+            auto *draw=ImGui::GetForegroundDrawList();
+            ImVec2 center(size.x*.5f,size.y*.5f);
+            draw->AddLine({center.x-16,center.y},{center.x-5,center.y},IM_COL32(150,215,220,150));
+            draw->AddLine({center.x+5,center.y},{center.x+16,center.y},IM_COL32(150,215,220,150));
+            draw->AddCircle(center,3,IM_COL32(150,215,220,150));
+            draw->AddText({size.x*.5f-58,size.y-36},IM_COL32(150,215,220,180),"CREW / COCKPIT WINDOW");
+        }
         if (m.flight == Flight::Choosing) destinationUI(m,c,ui);
-        else gameplayUI(m, c, s, ui);
+        gameplayUI(m, c, s, ui);
         return;
     }
     const auto &io = ImGui::GetIO();
@@ -222,10 +247,10 @@ void drawUI(Mission &m, Camera &c, Scene &s, const Particles &p, UIState &ui) {
     ImGui::SetNextWindowSize({294, 0});
     ImGui::Begin("Mission", nullptr,
                  ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize);
-    ImGui::TextColored({.45f, .86f, .8f, 1}, "BAIKONUR / FLIGHT CONTROL");
+    ImGui::TextColored({.45f, .86f, .8f, 1}, "AITU / BAIQONYR FLIGHT CONTROL");
     ImGui::Spacing();
     ImGui::PushFont(titleFont);
-    ImGui::TextUnformatted("Launch 09");
+    ImGui::TextUnformatted("NSH-119");
     ImGui::PopFont();
     ImGui::TextDisabled("A COMPUTER GRAPHICS STUDY");
     ImGui::Separator();
@@ -299,18 +324,21 @@ void drawUI(Mission &m, Camera &c, Scene &s, const Particles &p, UIState &ui) {
                 ? "R1  |  OpenGL core pipeline: triangles, VAO / VBO / EBO, original GLSL shaders"
             : ui.wall < 65
                 ? "R5 / R6  |  UV-mapped concrete, mipmaps, procedural steppe, orbit controls"
-            : ui.wall < 83
-                ? "CORE  |  Countdown, ignition, fire and smoke. Camera shake follows ignition."
-            : ui.wall < 99
-                ? "CORE  |  Chase camera tracks ascent. The atmosphere darkens with altitude."
-            : ui.wall < 100 ? "STRETCH  |  Four boosters detach in world space and fall away."
-            : ui.wall < 130 ? "STRETCH  |  Stars emerge at altitude. Pause freezes the mission; "
-                              "the camera stays free."
-            : ui.wall < 164
-                ? "R6 / R7  |  Reset, change lighting, replay. Live FPS stays visible throughout."
-            : ui.wall < 196
-                ? "NIGHT LAUNCH  |  Moving engine light, instanced flame, sorted translucent smoke"
-                : "BAIKONUR  |  Booster separation against the stars";
+            : ui.wall >= 155 && ui.wall < 175
+                ? "R6 / R7  |  Reset and inspect the scene. Live FPS stays visible throughout."
+            : ui.wall >= 135 && ui.wall < 155
+                ? "R6  |  Pause freezes the mission. The camera continues orbiting."
+            : m.boarding < Mission::boardingDuration
+                ? "CREW  |  Five astronauts board before the hatch closes and countdown starts."
+            : m.clock < -2
+                ? "CORE  |  Countdown starts after the crew have boarded."
+            : m.clock < 0
+                ? "STRETCH  |  Ignition shake, moving engine light, fire and smoke."
+            : m.clock < 24
+                ? "CORE  |  Chase camera follows ascent. The sky darkens with altitude."
+            : m.clock < 41
+                ? "STRETCH  |  Four boosters detach in world space and fall away."
+                : "STRETCH  |  High-altitude stars, detached boosters and a darkened atmosphere";
         ImGui::SetNextWindowPos({io.DisplaySize.x * .5f - 480, io.DisplaySize.y - 90});
         ImGui::SetNextWindowSize({960, 70});
         ImGui::Begin("Demo captions", nullptr, ImGuiWindowFlags_NoDecoration);

@@ -12,6 +12,12 @@ struct Geometry {
     std::vector<unsigned> indices;
 };
 Geometry cube();
+Geometry noseFairing();
+Geometry sweptWings();
+Geometry engineBell();
+Geometry landmarkLetters();
+Geometry companyLetters();
+Geometry landmarkHeart();
 Geometry cylinder(float top = 1.f, int segments = 96);
 Geometry sphere(int rings = 48, int segments = 96);
 Geometry kazakhstan();

@@ -1,0 +1,103 @@
+{
+  "description": "Selected checkpoints from the validated 240-second demo preview; full per-frame dump removed during cleanup.",
+  "checkpoints": [
+    {
+      "wall_seconds": 64.9986,
+      "mission_seconds": -8.0,
+      "altitude_m": 0.0,
+      "particles": 0.0,
+      "frame_ms": 16.7481
+    },
+    {
+      "wall_seconds": 78.9987,
+      "mission_seconds": -6.6665,
+      "altitude_m": 0.0,
+      "particles": 0.0,
+      "frame_ms": 16.927
+    },
+    {
+      "wall_seconds": 85.9983,
+      "mission_seconds": 0.333107,
+      "altitude_m": 0.0610282,
+      "particles": 869.0,
+      "frame_ms": 16.1346
+    },
+    {
+      "wall_seconds": 109.999,
+      "mission_seconds": 24.3334,
+      "altitude_m": 325.663,
+      "particles": 1363.0,
+      "frame_ms": 16.8601
+    },
+    {
+      "wall_seconds": 133.999,
+      "mission_seconds": 48.3333,
+      "altitude_m": 1284.86,
+      "particles": 1384.0,
+      "frame_ms": 16.577
+    },
+    {
+      "wall_seconds": 135.999,
+      "mission_seconds": 49.3334,
+      "altitude_m": 1338.58,
+      "particles": 1392.0,
+      "frame_ms": 16.6856
+    },
+    {
+      "wall_seconds": 153.999,
+      "mission_seconds": 49.3334,
+      "altitude_m": 1338.58,
+      "particles": 1392.0,
+      "frame_ms": 13.1291
+    },
+    {
+      "wall_seconds": 159.999,
+      "mission_seconds": -8.0,
+      "altitude_m": 0.0,
+      "particles": 0.0,
+      "frame_ms": 16.698
+    },
+    {
+      "wall_seconds": 175.999,
+      "mission_seconds": -8.0,
+      "altitude_m": 0.0,
+      "particles": 0.0,
+      "frame_ms": 16.7409
+    },
+    {
+      "wall_seconds": 195.999,
+      "mission_seconds": 0.333303,
+      "altitude_m": 0.0610999,
+      "particles": 868.0,
+      "frame_ms": 16.6227
+    },
+    {
+      "wall_seconds": 220.001,
+      "mission_seconds": 24.3358,
+      "altitude_m": 325.726,
+      "particles": 1364.0,
+      "frame_ms": 19.2346
+    },
+    {
+      "wall_seconds": 237.002,
+      "mission_seconds": 41.3371,
+      "altitude_m": 939.816,
+      "particles": 1379.0,
+      "frame_ms": 19.8847
+    },
+    {
+      "wall_seconds": 238.502,
+      "mission_seconds": 42.317,
+      "altitude_m": 984.9,
+      "particles": 1370.0,
+      "frame_ms": 16.5704
+    },
+    {
+      "wall_seconds": 239.501,
+      "mission_seconds": 42.317,
+      "altitude_m": 984.9,
+      "particles": 1370.0,
+      "frame_ms": 18.7659
+    }
+  ]
+}

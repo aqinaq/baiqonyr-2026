@@ -1,0 +1,29 @@
+{
+  "checked_on": "2026-11-16",
+  "base_commit": "7cb8b42",
+  "scope": "Tested implementation retained in the cleaned source tree",
+  "clean_release_build": "passed",
+  "ctest": "2/2 passed: mission_invariants, kazakhstan_terrain",
+  "runtime": "Native macOS run succeeded outside the sandbox; initial sandbox window-service attempt timed out",
+  "benchmark": "Three 15-second 1280x720 runs; zero OpenGL errors. See metrics.json for frame times and outliers.",
+  "visual_checks": [
+    "Ready scene",
+    "Booster separation",
+    "Wireframe",
+    "Moon landing and replacement flag",
+    "Demo high-altitude stars and FPS overlay"
+  ],
+  "manual_input": "Pending: raw executable was not exposed in the computer-use app inventory. Team must exercise keyboard/mouse.",
+  "ta_machine": "Not tested",
+  "full_demo_preview": "240 seconds completed, zero GL errors. Telemetry verified day/night altitude >900, pause 135-155s, reset and final pause at 238s. Selected samples retained in demo-checkpoints.json; no final MP4 recorded.",
+  "final_video": "Not recorded",
+  "report": "Teammate plans 2026-11-17",
+  "slides": "Another student is preparing slides",
+  "defense_date": "2026-11-19",
+  "brief_submission_deadline": "2026-11-16T23:59:00+05:00",
+  "flag": "Replaced unknown-source internet image with attributed Wikimedia public-domain rendition. SHA-256 in CREDITS.md.",
+  "packaging_preflight": "Missing report PDF/deck/video rejected before packaging. Editable DOCX is optional.",
+  "asset_copy": "Normal CMake build refreshed replacement PNG without relinking; source/build SHA-256 match.",
+  "source_archive": "Before cleanup, the source archive passed byte-for-byte verification, a fresh extracted Release build, 2/2 tests, and a native run outside the repository with zero GL errors. Generated archives/logs were removed; regenerate with tools/package.cmake.",
+  "remote_actions": "None; no push, tag, sharing changes or Moodle submission."
+}

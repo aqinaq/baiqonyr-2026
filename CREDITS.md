@@ -1,6 +1,6 @@
 # Credits and licenses
 
-The mesh construction, concrete texture, procedural steppe/sky/stars, GLSL scene and particle shaders, mission logic, and camera implementation were authored for this project with OpenAI Codex assistance. Kazakhstan's terrain outline is derived from the public-domain map data credited below. No third-party 3D model, photo texture, shader snippet, audio, or tutorial code was copied into application source.
+The mesh construction, concrete texture, procedural steppe/sky/stars, GLSL scene and particle shaders, mission logic, and camera implementation were authored for this project with OpenAI Codex assistance. Kazakhstan's terrain outline is derived from the public-domain map data credited below. The flag texture is a third-party asset credited below. No third-party 3D model, shader snippet, audio, or tutorial code was copied into application source.
 
 ## Kazakhstan terrain boundary
 
@@ -18,14 +18,24 @@ The GLAD file exposes a compatibility superset but the application explicitly re
 
 ## Conceptual references
 
-The project uses standard matrix transformations, Blinn-Phong lighting and particle lifecycle concepts. Its implementations are original project code, not copies of the papers. Fifteen journal references and their DOI links are listed in `docs/references.json` and the report. Research techniques that were reviewed but not implemented are labeled as comparisons or future work.
+The project uses standard matrix transformations, Blinn-Phong lighting and particle lifecycle concepts. Its implementations are original project code, not copies of the papers. Fifteen journal references and their DOI links are listed in `docs/references.json` for the report author to review. The final report is pending; do not claim that a listed research technique was implemented without code evidence.
 
-The supplied course lectures include material credited on their slides to E. Angel and D. Shreiner, *Interactive Computer Graphics*, 6th edition, Addison-Wesley, 2012. `docs/COURSE_MAP.md` maps the project to the supplied lecture PDF pages. Lecture files are not redistributed in the code package. The supplied report template's Astana IT University logo is retained only in the report.
+The supplied course lectures include material credited on their slides to E. Angel and D. Shreiner, *Interactive Computer Graphics*, 6th edition, Addison-Wesley, 2012. Lecture files are not redistributed in the code package. The supplied report template contains the Astana IT University logo; the final report is being prepared separately.
 
 ## Deliverable tooling
 
-The report uses the supplied course template. The presentation uses actual project captures. The MP4 is a real-time framebuffer capture of the application, with the same image displayed in its window, encoded by FFmpeg 7.1 via the imageio-ffmpeg distribution. FFmpeg and temporary authoring tools are not runtime dependencies and are not included in the source archive. Captions are drawn by the application; the video has no music or voice-over. The refreshed submission records the current application in one continuous native 1920x1080 take with four-sample MSAA and a visible FPS counter. H.264 compression retains the wall-clock timeline at 30 FPS. No footage is sped up or motion-interpolated. Any sub-frame ending adjustment holds the already-paused final image to reach exactly 200 seconds. Capture metadata is recorded in `docs/evidence/capture-edit.json`.
+The report and slides are being prepared by other students. Final demo recording is pending. The application can send real-time framebuffer frames to an external FFmpeg encoder at 30 FPS. FFmpeg is optional recording tooling, not an application runtime dependency. The application draws feature captions and the FPS counter. The current choreography lasts 240 seconds and includes crew boarding, launch, separation, stars, pause/reset and a night launch.
 
 ## AI Use
 
 OpenAI Codex generated the initial implementation, procedural assets, test code, documentation, report prose, and slides, and assisted with compilation, debugging, source verification, and capture. This is substantial AI assistance. The team has supplied its names and topic; personal code changes, independent review, and individual contributions have not yet been confirmed. Each member must review the code, make and document actual changes where needed, and be able to explain the complete submission. Do not represent this initial generated implementation as wholly student-authored.
+
+## Landing flag and image loading
+
+- `img/kz_flag.png`: 1280x640 PNG rendition of [Flag of Kazakhstan.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Kazakhstan.svg), downloaded from [Wikimedia](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Kazakhstan.svg/1280px-Flag_of_Kazakhstan.svg.png) on 16 November 2026. Flag design: Shaken Niyazbekov (the source page spells the name “Shaken Niyazbekop”); SVG revision by Wikimedia contributors, current upload 24 April 2023 by Kamran.nef. Commons marks this work public domain under `PD-KZ-exempt` (state symbols). The downloaded rendition is unchanged. SHA-256: `836709a18edba974ea4abe080a34d722254f1e08e6756877af28824dbed2caee`. This replaces the earlier internet image whose provenance was unknown.
+- `vendor/stb/stb_image.h`: Sean Barrett and contributors, stb_image, obtained from https://github.com/nothings/stb/blob/master/stb_image.h. Dual public-domain/MIT license retained at the end of the bundled header. Used to decode the flag PNG; only PNG decoding is enabled.
+- Hatch geometry, deployment animation, pole and support bar: project procedural geometry with OpenAI Codex assistance.
+
+## Expanded launch-site models
+
+The enlarged rocket details, rounded fairing, hollow engine bells, transport aircraft, runway, service mast, equipment, and I-heart-BAIQONYR sculpture are original procedural meshes made for this project with Codex assistance. The landmark uses original block glyphs and a parametric heart; no third-party logo artwork or aircraft model was imported. The launch site is an illustrative setting, not a surveyed model of the real facility.

@@ -1,6 +1,6 @@
 # Defense preparation
 
-The deck has 10 slides and a suggested 8 minute 40 second talk. The demo is 3 minutes 20 seconds. Assignments below are proposed speaking and review ownership, not claims of work already completed.
+A teammate is preparing the deck. The proposed outline below uses 10 slides and an 8 minute 40 second talk. The current automatic demo choreography is 4 minutes; the final video still needs recording. Assignments below are proposed speaking and review ownership, not claims of work already completed.
 
 | Member | Slides | Target | Review responsibility |
 |---|---|---|---|
@@ -25,7 +25,7 @@ Every member must also understand the other modules. Read the report AI Use Note
 - **How are particles efficient?** A bounded CPU pool holds lifetimes and velocities. One shared quad and an instance buffer render smoke and fire in two calls. Only dynamic instance data uploads each frame.
 - **What fixed the high-FPS emission bug?** A global spawn ordinal assigns the 2:1 fire/smoke ratio. Restarting that ordinal each frame biased the result whenever few particles spawned per frame.
 - **Why mipmaps?** They prefilter a texture for minification and reduce shimmering. The sampler uses `GL_LINEAR_MIPMAP_LINEAR` and repeating UVs.
-- **Do you implement the literature algorithms?** The report compares them. The application uses simpler course-level methods; it does not implement Navier-Stokes, wavelet turbulence, Cook-Torrance PBR or physical atmospheric scattering.
+- **Do you implement the literature algorithms?** The report author should compare them and distinguish them from implemented methods. The application uses simpler course-level methods; it does not implement Navier-Stokes, wavelet turbulence, Cook-Torrance PBR or physical atmospheric scattering.
 - **What do the FPS values mean?** They are measured frame-loop throughput, not an isolated GPU timer. VSync, capture and hardware affect them. The TA must repeat the exact 1280x720 test.
 - **What is missing?** Physical flight/combustion, shadows, Earth curvature, high-order smoke simulation and validated user studies. These are future work rather than claimed features.
 
@@ -33,8 +33,34 @@ Every member must also understand the other modules. Read the report AI Use Note
 
 ## Live demonstration fallback
 
-Build using README, run, orbit with drag or WASD, toggle L and N, toggle F, press Space, enable C, wait for T+24 separation, pause with P, orbit around the frozen formation, then R. If the video fails, this covers the same core features live.
+Build using README, run, orbit with drag or WASD, toggle L and N, toggle F, press Space, keep the third-person chase camera (3), wait for T+24 separation, pause with P, orbit around the frozen formation, then R. If the video fails, this covers the same core features live.
 
 ## Team actions before submission
 
-Confirm names/capitalization, actual contributions, course build setup and defense date. Register the topic if not already approved. Use https://github.com/aqinaq/baiqonyr, confirm TA access, make genuine member commits while reviewing and improving the project, and tag the actual submission revision `v1.0`. Do not fabricate backdated history. Upload the four deliverables three days before defense, by 23:59 Asia/Almaty. These account-based and personal actions are not performed by this package.
+Defense is confirmed for 19 November 2026; the brief implies a 16 November 2026, 23:59 Asia/Almaty submission deadline. Confirm actual contributions, course build setup and instructor agreement if submitting later. Register the topic if not already approved. Use https://github.com/aqinaq/baiqonyr-2026, confirm TA access, make genuine member commits while reviewing and improving the project, and tag the actual submission revision `v1.0`. Do not fabricate backdated history. Upload the four deliverables three days before defense, by 23:59 Asia/Almaty. These account-based and personal actions are not performed by this package.
+
+## Recording the current demo
+
+Build the current application, then preview `./build/baikonur --demo --duration 240`.
+Record using the README command with `--record output/Baikonur_Demo_1080p.mp4` and a working FFmpeg path. Keep the window visible and do not resize it. The final recording needs its own visual review; a passing preview is not a validated MP4.
+
+| Time | Planned evidence |
+|---|---|
+| 0:00-0:25 | Indexed scene objects, hierarchy, orbit and FPS |
+| 0:25-0:45 | Night lighting and toggled gantry light |
+| 0:45-0:55 | Wireframe geometry and pipeline caption |
+| 0:55-1:05 | Concrete texture, mipmaps and procedural ground |
+| 1:05-2:15 | Crew boarding, countdown, ignition shake, particles, ascent, separation and stars |
+| 2:15-2:35 | Pause with camera orbit |
+| 2:35-2:55 | Reset and scene inspection |
+| 2:55-4:00 | Second boarding and night launch, separation and stars |
+
+Launch captions follow the actual mission state, including the crew boarding delay. The preview demonstrates the core and three claimed stretch features. It does not show destination travel, landing ceremonies or the cockpit view; add a short authentic segment for those if you claim them in the final presentation, keeping the full video within 3-6 minutes. Show FPS throughout and explain which features are automatic playback versus manual input.
+
+Before recording, manually exercise drag/WASD, scroll/E/Q, Space, P, R, B, L, N, F, 1 and 3. Confirm the on-screen control panel remains readable. Current CLI runtime checks do not substitute for physical keyboard/mouse testing on the course machine.
+
+## Handoff to report and slide authors
+
+Use `docs/evidence/current/metrics.json` and the three raw benchmark CSVs for the local performance table. Hardware: Apple M1, macOS 27.2, OpenGL 4.1 Metal - 91.7, Release build, 1280x720, Retina and VSync disabled. Each scene runs for 15 seconds and excludes the first two seconds from statistics. Two ready-scene frames exceeded 33.33 ms; disclose those outliers rather than claiming every frame met 30 FPS. TA-machine measurements remain pending.
+
+Use the actual member names/groups in `docs/team.json`, the updated `CREDITS.md`, and accurate personal contributions. Include a specific AI Use Note. The final report must distinguish physical simulation from the project's illustrative trajectories and stylized Saturn landing.

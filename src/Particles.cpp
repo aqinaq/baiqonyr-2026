@@ -41,10 +41,10 @@ void Particles::emit(const Mission &m, bool fire) {
         p.y = std::max(.6f, alt - .4f);
         v = {std::cos(a) * (3 + random() * 4), 1 + random() * 2, std::sin(a) * (3 + random() * 4)};
     }
-    p = glm::vec3(m.rocket() * glm::vec4(p - glm::vec3(0, alt, 0), 1));
+    p = glm::vec3(m.rocketModel() * glm::vec4(p - glm::vec3(0, alt, 0), 1));
     v = glm::mat3(m.rocket()) * v;
     pool.push_back({p, v, 0, fire ? .35f + random() * .65f : 3 + random() * 3,
-                    fire ? .25f + random() * .3f : .7f + random(), fire});
+                    rocketScale*(fire ? .25f + random() * .3f : .7f + random()), fire});
 }
 void Particles::update(float dt, const Mission &m) {
     if (m.paused)
@@ -81,11 +81,11 @@ void Particles::update(float dt, const Mission &m) {
     }
 }
 void Particles::render(const Camera &c, int width, int height) {
-    glm::mat4 view = glm::lookAt(c.eye, c.target, glm::vec3(0, 1, 0));
+    glm::mat4 view = c.viewMatrix;
+    (void)width; (void)height;
     shader.use();
     shader.set("view", view);
-    shader.set("projection",
-               glm::perspective(glm::radians(48.f), float(width) / height, c.distance > 1000 ? 10.f : .1f, 30000.f));
+    shader.set("projection", c.projection);
     // Alpha smoke is sorted back to front. Additive fire does not need sorting.
     std::sort(pool.begin(), pool.end(), [&](const Particle &a, const Particle &b) {
         return glm::dot(a.p - c.eye, a.p - c.eye) > glm::dot(b.p - c.eye, b.p - c.eye);
