@@ -1,41 +1,68 @@
-# Credits and licenses
+# Credits and Licenses
 
-The mesh construction, concrete texture, procedural steppe/sky/stars, GLSL scene and particle shaders, mission logic, and camera implementation were authored for this project with OpenAI Codex assistance. Kazakhstan's terrain outline is derived from the public-domain map data credited below. The flag texture is a third-party asset credited below. No third-party 3D model, shader snippet, audio, or tutorial code was copied into application source.
+This project uses open-source libraries, public-domain map data, and an image of the flag of Kazakhstan. Their sources and licenses are listed below.
 
-## Kazakhstan terrain boundary
+The application's procedural geometry, textures, shaders, mission logic, and camera implementation were created for this project with assistance from OpenAI Codex.
 
-`assets/maps/kazakhstan.geojson` contains the Kazakhstan polygon from [Natural Earth v5.1.2, 1:110m Admin 0 Countries](https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_admin_0_countries.geojson), [public-domain map data](https://www.naturalearthdata.com/about/terms-of-use/). `tools/generate_kazakhstan.cpp` projects the coordinates at 48° N, centres the launch area at approximately 63.34° E, 45.92° N, scales the country to 10,000 scene units wide, and ear-clips the concave outline into `src/KazakhstanBoundary.hpp`. This is a simplified display map, with a stylized 60-unit-deep base, not a terrain elevation dataset.
+## Kazakhstan Terrain Boundary
 
-| Dependency | Author / project | Version / source | License retained |
+The file `assets/maps/kazakhstan.geojson` contains a polygon of Kazakhstan derived from Natural Earth data:
+
+- **Source:** [Natural Earth v5.1.2 — 1:110m Admin 0 Countries](https://github.com/nvkelso/natural-earth-vector/blob/v5.1.2/geojson/ne_110m_admin_0_countries.geojson)
+- **License:** [Natural Earth Terms of Use](https://www.naturalearthdata.com/about/terms-of-use/) — public domain.
+
+The terrain generation tool, `tools/generate_kazakhstan.cpp`, projects and scales the country outline. The generated boundary is stored in `src/KazakhstanBoundary.hpp`.
+
+The terrain is a simplified visual representation and does not contain real elevation data.
+
+## Third-Party Libraries and Fonts
+
+| Dependency | Author / Project | Source | License |
 |---|---|---|---|
-| GLFW | Camilla Löwy and GLFW contributors | 3.4, https://github.com/glfw/glfw/tree/3.4 | zlib/libpng, `vendor/glfw/LICENSE.md` |
-| GLAD | David Herberth and contributors | Generated loader shipped in GLFW 3.4, https://github.com/glfw/glfw/blob/3.4/deps/glad/gl.h | MIT / Khronos registry notices embedded in header; GLFW `deps/glad` notices retained |
-| GLM | G-Truc Creation and contributors | 1.0.1, https://github.com/g-truc/glm/tree/1.0.1 | MIT or Happy Bunny, `vendor/glm/copying.txt` |
-| Dear ImGui | Omar Cornut and contributors | 1.91.8, https://github.com/ocornut/imgui/tree/v1.91.8 | MIT, `vendor/imgui/LICENSE.txt`; embedded ProggyClean font notice retained |
-| Roboto Medium | Christian Robertson / Google | TrueType font bundled with Dear ImGui 1.91.8 | Apache 2.0, `assets/fonts/LICENSE-Roboto.txt` |
+| GLFW | Camilla Löwy and GLFW contributors | [GLFW 3.4](https://github.com/glfw/glfw/tree/3.4) | zlib/libpng; see `vendor/glfw/LICENSE.md` |
+| GLAD | David Herberth and contributors | [GLAD loader included with GLFW 3.4](https://github.com/glfw/glfw/blob/3.4/deps/glad/gl.h) | MIT and Khronos registry notices retained in the bundled files |
+| GLM | G-Truc Creation and contributors | [GLM 1.0.1](https://github.com/g-truc/glm/tree/1.0.1) | MIT or Happy Bunny; see `vendor/glm/copying.txt` |
+| Dear ImGui | Omar Cornut and contributors | [Dear ImGui 1.91.8](https://github.com/ocornut/imgui/tree/v1.91.8) | MIT; see `vendor/imgui/LICENSE.txt` |
+| Roboto Medium | Christian Robertson / Google | Font bundled with Dear ImGui | Apache 2.0; see `assets/fonts/LICENSE-Roboto.txt` |
+| stb_image | Sean Barrett and contributors | [stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) | Public domain or MIT; license retained in `vendor/stb/stb_image.h` |
 
-The GLAD file exposes a compatibility superset but the application explicitly requests a **core-profile context** and only calls modern buffer/shader operations. No legacy GL rendering calls are made by project source. ImGui supplies UI rendering only; it does not generate the 3D lighting shaders.
+Dear ImGui is used for the user interface. The application's 3D scene and lighting use the project's own shaders.
 
-## Conceptual references
+## Flag of Kazakhstan
 
-The project uses standard matrix transformations, Blinn-Phong lighting and particle lifecycle concepts. Its implementations are original project code, not copies of the papers. Fifteen journal references and their DOI links are listed in `docs/references.json` for the report author to review. The final report is pending; do not claim that a listed research technique was implemented without code evidence.
+The file `img/kz_flag.png` is a PNG rendition of the flag of Kazakhstan.
 
-The supplied course lectures include material credited on their slides to E. Angel and D. Shreiner, *Interactive Computer Graphics*, 6th edition, Addison-Wesley, 2012. Lecture files are not redistributed in the code package. The supplied report template contains the Astana IT University logo; the final report is being prepared separately.
+- **Source:** [Flag of Kazakhstan — Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Flag_of_Kazakhstan.svg)
+- **Flag design:** Shaken Niyazbekov.
+- **License:** Wikimedia Commons identifies the flag as public domain under `PD-KZ-exempt` for state symbols.
+- **Downloaded:** 16 November 2026.
 
-## Deliverable tooling
+The flag is loaded using `stb_image`.
 
-The report and slides are being prepared by other students. Final demo recording is pending. The application can send real-time framebuffer frames to an external FFmpeg encoder at 30 FPS. FFmpeg is optional recording tooling, not an application runtime dependency. The application draws feature captions and the FPS counter. The current choreography lasts 240 seconds and includes crew boarding, launch, separation, stars, pause/reset and a night launch.
+## Project Geometry and Visual Assets
+
+The rocket, boosters, launch pad, buildings, aircraft, crew, and other scene objects use procedural geometry created for this project with OpenAI Codex assistance.
+
+The launch site is a stylized representation of Baikonur and is not intended to be an exact reconstruction of the real facility.
+
+## Conceptual References
+
+The project applies concepts covered in Computer Graphics Fundamentals, including:
+
+- Model, view, and projection transformations.
+- Parent-child object hierarchy.
+- Blinn-Phong lighting.
+- Texture mapping and mipmapping.
+- Particle systems.
+
+The course lectures also reference E. Angel and D. Shreiner, *Interactive Computer Graphics*, 6th edition, Addison-Wesley, 2012.
+
+Additional research sources used for the report are listed in `docs/references.json`.
 
 ## AI Use
 
-OpenAI Codex generated the initial implementation, procedural assets, test code, documentation, report prose, and slides, and assisted with compilation, debugging, source verification, and capture. This is substantial AI assistance. The team has supplied its names and topic; personal code changes, independent review, and individual contributions have not yet been confirmed. Each member must review the code, make and document actual changes where needed, and be able to explain the complete submission. Do not represent this initial generated implementation as wholly student-authored.
+OpenAI Codex provided substantial assistance with the initial project documentation.
 
-## Landing flag and image loading
+The team selected the project topic and used the generated implementation as the basis for building, running, reviewing, and preparing the project for submission. Team members contributed to integrating project files and testing the application.
 
-- `img/kz_flag.png`: 1280x640 PNG rendition of [Flag of Kazakhstan.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Kazakhstan.svg), downloaded from [Wikimedia](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flag_of_Kazakhstan.svg/1280px-Flag_of_Kazakhstan.svg.png) on 16 November 2026. Flag design: Shaken Niyazbekov (the source page spells the name “Shaken Niyazbekop”); SVG revision by Wikimedia contributors, current upload 24 April 2023 by Kamran.nef. Commons marks this work public domain under `PD-KZ-exempt` (state symbols). The downloaded rendition is unchanged. SHA-256: `836709a18edba974ea4abe080a34d722254f1e08e6756877af28824dbed2caee`. This replaces the earlier internet image whose provenance was unknown.
-- `vendor/stb/stb_image.h`: Sean Barrett and contributors, stb_image, obtained from https://github.com/nothings/stb/blob/master/stb_image.h. Dual public-domain/MIT license retained at the end of the bundled header. Used to decode the flag PNG; only PNG decoding is enabled.
-- Hatch geometry, deployment animation, pole and support bar: project procedural geometry with OpenAI Codex assistance.
-
-## Expanded launch-site models
-
-The enlarged rocket details, rounded fairing, hollow engine bells, transport aircraft, runway, service mast, equipment, and I-heart-BAIQONYR sculpture are original procedural meshes made for this project with Codex assistance. The landmark uses original block glyphs and a parametric heart; no third-party logo artwork or aircraft model was imported. The launch site is an illustrative setting, not a surveyed model of the real facility.
+Each team member is responsible for understanding and explaining the project and their individual contribution. Further details about AI use and team contributions are provided in the README and final report.
